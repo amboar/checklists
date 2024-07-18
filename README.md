@@ -52,7 +52,7 @@ reliability of the outcome through completeness of the checklist.
 
 ## Implementation Design Philosophy
 
-The implementation tries not to be overly-prescriptive in the tools you're
+The implementation tries not to be overly-prescriptive in the tools you must be
 familiar with. Primarily, `cl` is a wrapper around `$EDITOR` and `git`, and is
 implemented as a POSIX-compliant shell script.
 
