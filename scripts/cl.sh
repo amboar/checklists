@@ -256,7 +256,7 @@ main()
 			printf "\n[comment]: # %s\n" "$slug"
 			cat "$(checklist_derive_path_from_slug "$checklists" "$slug")"
 		done > "$execution_path"
-		( "$EDITOR" "$execution_path" && git add "$execution_path" && git commit "$execution_path" -m "executions: Capture $execution_label" ) || (git reset --hard; git clean -df)
+		( "$EDITOR" "$execution_path" && git add "$execution_path" && git commit "$execution_path" -m "executions: Capture $execution_slug" ) || (git reset --hard; git clean -df)
 		;;
 
 	*)
