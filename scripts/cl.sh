@@ -121,7 +121,7 @@ main()
 			loge Checklist path \'"$checklist_path"\' does not exist
 
 		mkdir -p "${checklists}"
-		( "$EDITOR" "$checklist_path" && git add "$checklist_path" && git commit "$checklist_path" ) || ( git reset --hard; git clean -df )
+		( "$EDITOR" "$checklist_path" && git add "$checklist_path" && git commit ) || ( git reset --hard; git clean -df )
 		;;
 
 	backup)
@@ -256,7 +256,7 @@ main()
 			printf "\n[comment]: # %s\n" "$slug"
 			cat "$(checklist_derive_path_from_slug "$checklists" "$slug")"
 		done > "$execution_path"
-		( "$EDITOR" "$execution_path" && git add "$execution_path" && git commit "$execution_path" -m "executions: Capture $execution_slug" ) || (git reset --hard; git clean -df)
+		( "$EDITOR" "$execution_path" && git add "$execution_path" && git commit -m "executions: Capture $execution_slug" ) || (git reset --hard; git clean -df)
 		;;
 
 	*)
