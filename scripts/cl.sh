@@ -251,13 +251,16 @@ main()
 		[ ! -f "$execution_path" ] ||
 			loge Execution path \'"$execution_path"\' already exists
 
-		mkdir -p "$(dirname "$execution_path")"
+		execution_dir="$(dirname "$execution_path")"
+		mkdir -p "$execution_dir"
 		for slug in $checklist_slugs
 		do
 			printf "\n[comment]: # %s\n" "$slug"
 			cat "$(checklist_derive_path_from_slug "$checklists" "$slug")"
 		done > "$execution_path"
-		( "$EDITOR" "$execution_path" && git add "$execution_path" && git commit -m "executions: Capture $execution_slug" ) || (git reset --hard; git clean -df)
+
+		"$EDITOR" "$execution_path" || ( rm "$execution_path" && rmdir "$execution_dir" && false )
+		git add "$execution_path" && git commit -m "executions: Capture $execution_slug"
 		;;
 
 	*)
