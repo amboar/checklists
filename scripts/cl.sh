@@ -195,9 +195,8 @@ main()
 			loge Checklist path \'"$checklist_path"\' already exists
 
 		mkdir -p "$checklists"
-		sed -E 's/^( *)- \[x\]/\1- [ ]/' "$execution_path" > "$checklist_path" &&
-			git add "$checklist_path" &&
-			git commit -m "checklists: promote $execution_slug to $checklist_slug"
+		sed -E 's/^( *)- \[x\]/\1- [ ]/' "$execution_path" > "$checklist_path" || ( rm -f "$checklist_path" && false )
+		git add "$checklist_path" && git commit -m "checklists: promote $execution_slug to $checklist_slug"
 		;;
 
 	show)
