@@ -121,7 +121,8 @@ main()
 			loge Checklist path \'"$checklist_path"\' does not exist
 
 		mkdir -p "${checklists}"
-		( "$EDITOR" "$checklist_path" && git add "$checklist_path" && git commit ) || ( git reset --hard; git clean -df )
+		"$EDITOR" "$checklist_path" || ( rm -f "${checklist_path}" && false )
+		( git add "$checklist_path" && git commit ) || ( git restore --staged "$checklist_path" && rm "$checklist_path" && false )
 		;;
 
 	backup)
