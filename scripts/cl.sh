@@ -143,7 +143,7 @@ main()
 		[ -f "$checklist_path" ] ||
 			loge Checklist path \'"$checklist_path"\' does not exist
 
-		( "$EDITOR" "$checklist_path" && git commit "$checklist_path" ) || ( git reset --hard )
+		( "$EDITOR" "$checklist_path" && git commit "$checklist_path" ) || ( git restore "$checklist_path" && false )
 		;;
 
 	help)
