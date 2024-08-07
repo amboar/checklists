@@ -69,12 +69,12 @@ execution of checklists. Updating is a matter of merging changes from upstream.
 ./scripts/cl.sh: Checklist maintenance and execution
 
 Subcommands:
-
         add NAME
                 Edit and track a new checklist named NAME
 
         backup TARGET
-                Push the tracked checklists and executions to the remote git repository TARGET
+                Push the tracked checklists and executions to the remote git
+                repository TARGET
 
         edit NAME
                 Edit an existing checklist identified by NAME
@@ -86,10 +86,14 @@ Subcommands:
                 List checklists or executions
 
         promote EXECUTION CHECKLIST
-                Lift the execution identified by EXECUTION to a checklist named CHECKLIST for reuse
+                Lift the execution identified by EXECUTION to a checklist named
+                CHECKLIST for reuse
 
-        show <execution | checklist> NAME
+        show <checklist | execution | parameters> NAME
                 Output a checklist or execution identified by NAME
+
+                In the case of 'parameters', show the variables that can be
+                substituted into the checklist from the environment
 
         rename CURRENT NEW
                 Rename a checklist identified by CURRENT to NEW
@@ -97,3 +101,26 @@ Subcommands:
         run EXECUTION [CHECKLIST ...]
                 Execute a task, guided by zero or more checklists
 ```
+
+## Tricks
+
+Execution checklists (the concatonation of all listed checklists) are passed
+through [envsubst][man-1-envsubst]. This allows you to define values for the
+execution by setting them in the environment at the invocation of `cl run ...`,
+for instance: `MY_PARAMETER=foo cl run ...`
+
+[man-1-envsubst]: https://www.man7.org/linux/man-pages/man1/envsubst.1.html
+
+To exploit this you should must describe each formal parameter for the checklist
+in informal markdown comment style:
+
+```
+[parameter]: # MY_PARAMETER
+```
+
+I tend to do this at the top of my checklists.
+
+In this way both you and `cl` can determine what substitutions are possible.
+The list of parameters defined by a checklist can be discovered using `cl show
+parameters CHECKLIST`. Checklist parameters whose variables are not defined in
+the environment are not substituted for the execution.

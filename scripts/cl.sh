@@ -5,6 +5,9 @@
 
 set -eu
 
+: "${ENVSUBST:="$(command -v envsubst)"}"
+: "${SPONGE:="$(command -v sponge)"}"
+
 checklist_derive_path_from_slug()
 {
 	checklist_root="$1"
@@ -18,6 +21,12 @@ checklist_derive_slug_from_path()
 	checklist_root="$1"
 	checklist_path="$2"
 	basename "$checklist_path" .md
+}
+
+checklist_get_parameters()
+{
+	checklist_path="$1"
+	grep -F '[parameter]: # ' "$checklist_path" | sed -E 's/\[parameter\]: # //'
 }
 
 execution_generate_datetime()
@@ -45,6 +54,18 @@ execution_derive_slug_from_path()
 	execution_path="$2"
 	execution_slug="$(realpath --relative-to="$execution_root" "$execution_path")"
 	echo "$(dirname "$execution_slug")/$(basename "$execution_slug" .md)"
+}
+
+execution_get_substitutions()
+{
+	execution_path="$1"
+	for pn in $(checklist_get_parameters "$execution_path")
+	do
+		set +u
+		eval "p=\$$pn"
+		set -u
+		[ -z "$p" ] || printf "$%s," "$pn";
+	done
 }
 
 help()
@@ -75,8 +96,11 @@ help()
 	printf "\t\tLift the execution identified by EXECUTION to a checklist named\n"
 	printf "\t\tCHECKLIST for reuse\n"
 	echo
-	printf "\tshow <execution | checklist> NAME\n"
+	printf "\tshow <checklist | execution | parameters> NAME\n"
 	printf "\t\tOutput a checklist or execution identified by NAME\n"
+	echo
+	printf "\t\tIn the case of 'parameters', show the variables that can be\n"
+	printf "\t\tsubstituted into the checklist from the environment\n"
 	echo
 	printf "\trename CURRENT NEW\n"
 	printf "\t\tRename a checklist identified by CURRENT to NEW\n"
@@ -213,6 +237,10 @@ main()
 			execution_slug="$2"
 			cat "$(execution_derive_path_from_slug "$executions" "$execution_slug")"
 			;;
+		parameters)
+			checklist_slug="$2"
+			checklist_get_parameters "$(checklist_derive_path_from_slug "$checklists" "$checklist_slug")"
+			;;
 		esac
 		;;
 
@@ -258,6 +286,10 @@ main()
 			printf "\n[comment]: # %s\n" "$slug"
 			cat "$(checklist_derive_path_from_slug "$checklists" "$slug")"
 		done > "$execution_path"
+
+		execution_substitutions="$(execution_get_substitutions "$execution_path")"
+		# shellcheck disable=SC2094
+		"$ENVSUBST" "$execution_substitutions" < "$execution_path" | "$SPONGE" "$execution_path" > /dev/null
 
 		"$EDITOR" "$execution_path" || ( rm "$execution_path" && rmdir "$execution_dir" && false )
 		git add "$execution_path" && git commit -m "executions: Capture $execution_slug"
