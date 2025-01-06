@@ -79,6 +79,9 @@ help()
 	printf "\tadd NAME\n"
 	printf "\t\tEdit and track a new checklist named NAME\n"
 	echo
+	printf "\tarchive rotate\n"
+	printf "\t\tTidy up older executions\n"
+	echo
 	printf "\tbackup TARGET\n"
 	printf "\t\tPush the tracked checklists and executions to the remote git\n"
 	printf "\t\trepository TARGET\n"
@@ -147,6 +150,39 @@ main()
 		mkdir -p "${checklists}"
 		"$EDITOR" "$checklist_path" || ( rm -f "${checklist_path}" && false )
 		( git add "$checklist_path" && git commit ) || ( git restore --staged "$checklist_path" && rm "$checklist_path" && false )
+		;;
+
+	archive)
+		[ $# -eq 1 ] || loge \'archive\' subcommand only supports \'rotate\' argument
+		[ "$1" = "rotate" ] || loge \'archive\' subcommand only supports \'rotate\' argument, found \'"$1"\'
+
+		date_Y=$(date +%Y)
+		date_m=$(date +%m)
+
+		# rotate by month
+		for D in "$executions"/*Y*m*d*
+		do
+			[ -d "$D" ] || break
+			archive_m="${D%m*}m"
+			if [ "$archive_m" != "$executions"/"${date_Y}Y${date_m}m" ]
+			then
+				mkdir -p "$archive_m"
+				git mv "$D" "$archive_m"
+			fi
+		done
+
+		# rotate by year
+		for M in "$executions"/*Y*m
+		do
+			[ -d "$M" ] || break
+			archive_Y="${M%Y*}Y"
+			if [ "$archive_Y" != "$executions"/"${date_Y}Y" ]
+			then
+				mkdir -p "$archive_Y"
+				git mv "$M" "$archive_Y"
+			fi
+		done
+		git commit -m "executions: Rotate for ${archive_m#"${executions}"/}"
 		;;
 
 	backup)

@@ -72,6 +72,9 @@ Subcommands:
         add NAME
                 Edit and track a new checklist named NAME
 
+        archive rotate
+                Tidy up older executions
+
         backup TARGET
                 Push the tracked checklists and executions to the remote git
                 repository TARGET
