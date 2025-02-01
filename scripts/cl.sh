@@ -6,6 +6,7 @@
 set -eu
 
 : "${ENVSUBST:="$(command -v envsubst)"}"
+: "${PAGER:="$( ( [ -n "$(command -v less)" ] && echo "$(command -v less)" -F ) || echo cat )"}"
 : "${SPONGE:="$(command -v sponge)"}"
 
 checklist_derive_path_from_slug()
@@ -267,15 +268,15 @@ main()
 		case "$category" in
 		checklist)
 			checklist_slug="$2"
-			cat "$(checklist_derive_path_from_slug "$checklists" "$checklist_slug")"
+			$PAGER "$(checklist_derive_path_from_slug "$checklists" "$checklist_slug")"
 			;;
 		execution)
 			execution_slug="$2"
-			cat "$(execution_derive_path_from_slug "$executions" "$execution_slug")"
+			$PAGER "$(execution_derive_path_from_slug "$executions" "$execution_slug")"
 			;;
 		parameters)
 			checklist_slug="$2"
-			checklist_get_parameters "$(checklist_derive_path_from_slug "$checklists" "$checklist_slug")"
+			checklist_get_parameters "$(checklist_derive_path_from_slug "$checklists" "$checklist_slug")" | $PAGER
 			;;
 		esac
 		;;
