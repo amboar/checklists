@@ -107,6 +107,8 @@ Subcommands:
 
 ## Tricks
 
+### Parameterised checklists
+
 Execution checklists (the concatonation of all listed checklists) are passed
 through [envsubst][man-1-envsubst]. This allows you to define values for the
 execution by setting them in the environment at the invocation of `cl run ...`,
@@ -127,3 +129,17 @@ In this way both you and `cl` can determine what substitutions are possible.
 The list of parameters defined by a checklist can be discovered using `cl show
 parameters CHECKLIST`. Checklist parameters whose variables are not defined in
 the environment are not substituted for the execution.
+
+### Checklist metadata
+
+Invocations of `cl run ...` both substitute into the document and export the
+following variables into the environment of `$EDITOR`:
+
+- `CL_EXECUTION_SLUG`
+
+These exports can be used in subshells from your editor to attach e.g. command
+output to your current execution:
+
+```sh
+$ cl attach output "$CL_EXECUTION_SLUG" ...
+```

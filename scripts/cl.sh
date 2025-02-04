@@ -59,8 +59,7 @@ execution_derive_slug_from_path()
 
 execution_get_substitutions()
 {
-	execution_path="$1"
-	for pn in $(checklist_get_parameters "$execution_path")
+	for pn in "$@"
 	do
 		set +u
 		eval "p=\$$pn"
@@ -184,6 +183,27 @@ main()
 			fi
 		done
 		git commit -m "executions: Rotate for ${archive_m#"${executions}"/}"
+		;;
+
+	attach)
+		[ $# -ge 1 ] ||
+			loge \'attach\' subcommand requires the \'output\' keyword
+
+		[ $# -ge 2 ] ||
+			loge \'attach output\' subcommand requires the execution slug to locate the output destination
+
+		[ $# -ge 3 ] ||
+			loge \'attach output\' subcommand requires a name for the output file
+
+		[ $# -ge 4 ] ||
+			loge \'attach output\' subcommand requires a command to execute
+
+		execution_slug="$2"
+		attachment_name="$3"
+		shift 3
+
+		execution_dir="$(dirname "$(execution_derive_path_from_slug "$executions" "$execution_slug")")"
+		/bin/sh -lic "$@" | tee "$execution_dir"/"$attachment_name"
 		;;
 
 	backup)
@@ -324,12 +344,14 @@ main()
 			cat "$(checklist_derive_path_from_slug "$checklists" "$slug")"
 		done > "$execution_path"
 
-		execution_substitutions="$(execution_get_substitutions "$execution_path")"
-		# shellcheck disable=SC2094
-		"$ENVSUBST" "$execution_substitutions" < "$execution_path" | "$SPONGE" "$execution_path" > /dev/null
+		checklist_parameters="$(checklist_get_parameters "$execution_path")"
+		export CL_EXECUTION_SLUG="$execution_slug"
+		# shellcheck disable=SC2094,SC2086,SC2016
+		"$ENVSUBST" "$(execution_get_substitutions $checklist_parameters 'CL_EXECUTION_SLUG')" < "$execution_path" |
+			"$SPONGE" "$execution_path" > /dev/null
 
 		"$EDITOR" "$execution_path" || ( rm "$execution_path" && rmdir "$execution_dir" && false )
-		git add "$execution_path" && git commit -m "executions: Capture $execution_slug"
+		git add "$execution_dir" && git commit -m "executions: Capture $execution_slug"
 		;;
 
 	*)
