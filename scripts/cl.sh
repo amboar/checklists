@@ -206,7 +206,9 @@ main()
 		shift 3
 
 		execution_dir="$(dirname "$(execution_derive_path_from_slug "$executions" "$execution_slug")")"
-		/bin/sh -lic "$@" | tee "$execution_dir"/"$attachment_name"
+		attachment_path="$execution_dir"/"$attachment_name"
+		cd - # Change back to where we were invoked, as directory context may be important
+		/bin/sh -lic "$*" 2>&1 | tee "$attachment_path"
 		;;
 
 	backup)
