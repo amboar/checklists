@@ -82,6 +82,9 @@ help()
 	printf "\tarchive rotate\n"
 	printf "\t\tTidy up older executions\n"
 	echo
+	printf "\tattach output EXECUTION FILE COMMAND...\n"
+	printf "\t\tRun COMMAND and capture the output in FILE alongside EXECUTION\n"
+	echo
 	printf "\tbackup TARGET\n"
 	printf "\t\tPush the tracked checklists and executions to the remote git\n"
 	printf "\t\trepository TARGET\n"

@@ -75,6 +75,9 @@ Subcommands:
         archive rotate
                 Tidy up older executions
 
+        attach output EXECUTION FILE COMMAND...
+                Run COMMAND and capture the output in FILE alongside EXECUTION
+
         backup TARGET
                 Push the tracked checklists and executions to the remote git
                 repository TARGET
