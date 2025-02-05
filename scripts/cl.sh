@@ -215,12 +215,11 @@ main()
 		output)
 			attachment_name="$3"
 
-			shift 3
-
 			attachment_path="$execution_dir"/"$attachment_name"
 			cd - # Change back to where we were invoked, as directory context may be important
 			if [ $# -gt 3 ]
 			then
+				shift 3
 				/bin/sh -lic "$*" 2>&1 | tee "$attachment_path"
 			else
 				tee "$attachment_path"
