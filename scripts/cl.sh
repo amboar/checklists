@@ -82,7 +82,10 @@ help()
 	printf "\tarchive rotate\n"
 	printf "\t\tTidy up older executions\n"
 	echo
-	printf "\tattach output EXECUTION FILE COMMAND...\n"
+	printf "\tattach file EXECUTION FILE\n"
+	printf "\t\tCopy FILE alongside EXECUTION\n"
+	echo
+	printf "\tattach output EXECUTION FILE [COMMAND...]\n"
 	printf "\t\tRun COMMAND and capture the output in FILE alongside EXECUTION\n"
 	echo
 	printf "\tbackup TARGET\n"
@@ -198,17 +201,32 @@ main()
 		[ $# -ge 3 ] ||
 			loge \'attach output\' subcommand requires a name for the output file
 
-		[ $# -ge 4 ] ||
-			loge \'attach output\' subcommand requires a command to execute
-
+		attach_subcmd="$1"
 		execution_slug="$2"
-		attachment_name="$3"
-		shift 3
 
 		execution_dir="$(dirname "$(execution_derive_path_from_slug "$executions" "$execution_slug")")"
-		attachment_path="$execution_dir"/"$attachment_name"
-		cd - # Change back to where we were invoked, as directory context may be important
-		/bin/sh -lic "$*" 2>&1 | tee "$attachment_path"
+
+		case $attach_subcmd in
+		file)
+			file_name="$3"
+
+			cp "$file_name" "$execution_dir"/
+			;;
+		output)
+			attachment_name="$3"
+
+			shift 3
+
+			attachment_path="$execution_dir"/"$attachment_name"
+			cd - # Change back to where we were invoked, as directory context may be important
+			if [ $# -gt 3 ]
+			then
+				/bin/sh -lic "$*" 2>&1 | tee "$attachment_path"
+			else
+				tee "$attachment_path"
+			fi
+			;;
+		esac
 		;;
 
 	backup)

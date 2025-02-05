@@ -75,7 +75,10 @@ Subcommands:
         archive rotate
                 Tidy up older executions
 
-        attach output EXECUTION FILE COMMAND...
+        attach file EXECUTION FILE
+                Copy FILE alongside EXECUTION
+
+        attach output EXECUTION FILE [COMMAND...]
                 Run COMMAND and capture the output in FILE alongside EXECUTION
 
         backup TARGET
