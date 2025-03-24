@@ -88,6 +88,9 @@ Subcommands:
         edit NAME
                 Edit an existing checklist identified by NAME
 
+        exec[ute] EXECUTION [CHECKLIST ...]
+                Execute a task, guided by zero or more checklists
+
         help
                 Show help text
 
@@ -107,8 +110,9 @@ Subcommands:
         rename CURRENT NEW
                 Rename a checklist identified by CURRENT to NEW
 
-        run EXECUTION [CHECKLIST ...]
-                Execute a task, guided by zero or more checklists
+        run SCRIPT EXECUTION
+                Extract SCRIPT from EXECUTION and run it, attaching the output
+                to EXECUTION
 ```
 
 ## Tricks
@@ -149,3 +153,22 @@ output to your current execution:
 ```sh
 $ cl attach output "$CL_EXECUTION_SLUG" ...
 ```
+
+### `sh` scripts in checklists
+
+An entire script can be embedded to be run as a single step. For example:
+
+    - [ ] `cl run hello-world ${CL_EXECUTION_SLUG}`
+    
+    ```sh name=hello-world
+    set -eux
+    
+    printf "hello"
+    printf ", "
+    printf "world!\n"
+    ```
+
+For simplicity of the implementation such scripts are directly piped into `sh`.
+This may change down the track.
+
+The output of the script is attached to the current execution.

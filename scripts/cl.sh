@@ -95,6 +95,9 @@ help()
 	printf "\tedit NAME\n"
 	printf "\t\tEdit an existing checklist identified by NAME\n"
 	echo
+	printf "\texec[ute] EXECUTION [CHECKLIST ...]\n"
+	printf "\t\tExecute a task, guided by zero or more checklists\n"
+	echo
 	printf "\thelp\n"
 	printf "\t\tShow help text\n"
 	echo
@@ -114,8 +117,9 @@ help()
 	printf "\trename CURRENT NEW\n"
 	printf "\t\tRename a checklist identified by CURRENT to NEW\n"
 	echo
-	printf "\trun EXECUTION [CHECKLIST ...]\n"
-	printf "\t\tExecute a task, guided by zero or more checklists\n"
+	printf "\trun SCRIPT EXECUTION\n"
+	printf "\t\tExtract SCRIPT from EXECUTION and run it, attaching the output\n"
+	printf "\t\tto EXECUTION\n"
 }
 
 loge()
@@ -249,6 +253,40 @@ main()
 		( "$EDITOR" "$checklist_path" && git commit "$checklist_path" ) || ( git restore "$checklist_path" && false )
 		;;
 
+	exec|execute)
+		# Allow for ephemeral checklists by only requiring an execution label
+		[ $# -ge 1 ] ||
+			loge \'"$subcmd"\' command requires an execution name
+
+		execution_label="$1"
+		shift
+		checklist_slugs="$*"
+		execution_datetime="$(execution_generate_datetime)"
+		execution_slug="$(execution_derive_slug_from_components "$execution_datetime" "$execution_label")"
+		execution_path="$(execution_derive_path_from_slug "$executions" "$execution_slug")"
+		for slug in $checklist_slugs; do [ -f "$(checklist_derive_path_from_slug "$checklists" "$slug")" ]; done
+
+		[ ! -f "$execution_path" ] ||
+			loge Execution path \'"$execution_path"\' already exists
+
+		execution_dir="$(dirname "$execution_path")"
+		mkdir -p "$execution_dir"
+		for slug in $checklist_slugs
+		do
+			printf "\n[comment]: # %s\n" "$slug"
+			cat "$(checklist_derive_path_from_slug "$checklists" "$slug")"
+		done > "$execution_path"
+
+		checklist_parameters="$(checklist_get_parameters "$execution_path")"
+		export CL_EXECUTION_SLUG="$execution_slug"
+		# shellcheck disable=SC2094,SC2086,SC2016
+		"$ENVSUBST" "$(execution_get_substitutions $checklist_parameters 'CL_EXECUTION_SLUG')" < "$execution_path" |
+			"$SPONGE" "$execution_path" > /dev/null
+
+		"$EDITOR" "$execution_path" || ( rm "$execution_path" && rmdir "$execution_dir" && false )
+		git add "$execution_dir" && git commit -m "executions: Capture $execution_slug"
+		;;
+
 	help)
 		help "$name"
 		;;
@@ -343,37 +381,17 @@ main()
 		;;
 
 	run)
-		# Allow for ephemeral checklists by only requiring an execution label
-		[ $# -ge 1 ] ||
-			loge \'run\' command requires an execution name
+		[ $# -ge 2 ] ||
+			loge \'run\' subcommand requires two positional arguments: The script name followed by the relevant execution name
 
-		execution_label="$1"
-		shift
-		checklist_slugs="$*"
-		execution_datetime="$(execution_generate_datetime)"
-		execution_slug="$(execution_derive_slug_from_components "$execution_datetime" "$execution_label")"
+		execution_script="$1"
+		execution_slug="$2"
+
 		execution_path="$(execution_derive_path_from_slug "$executions" "$execution_slug")"
-		for slug in $checklist_slugs; do [ -f "$(checklist_derive_path_from_slug "$checklists" "$slug")" ]; done
-
-		[ ! -f "$execution_path" ] ||
-			loge Execution path \'"$execution_path"\' already exists
-
-		execution_dir="$(dirname "$execution_path")"
-		mkdir -p "$execution_dir"
-		for slug in $checklist_slugs
-		do
-			printf "\n[comment]: # %s\n" "$slug"
-			cat "$(checklist_derive_path_from_slug "$checklists" "$slug")"
-		done > "$execution_path"
-
-		checklist_parameters="$(checklist_get_parameters "$execution_path")"
-		export CL_EXECUTION_SLUG="$execution_slug"
-		# shellcheck disable=SC2094,SC2086,SC2016
-		"$ENVSUBST" "$(execution_get_substitutions $checklist_parameters 'CL_EXECUTION_SLUG')" < "$execution_path" |
-			"$SPONGE" "$execution_path" > /dev/null
-
-		"$EDITOR" "$execution_path" || ( rm "$execution_path" && rmdir "$execution_dir" && false )
-		git add "$execution_dir" && git commit -m "executions: Capture $execution_slug"
+		sed --quiet -E "/[\`]{3}([a-z]+ )?name=${execution_script}/,/[\`]{3}/p" "${execution_path}" |
+			sed '1d;$d' |
+			sh 2>&1 |
+			"$script" attach output "${execution_slug}" "${execution_script}"
 		;;
 
 	*)
