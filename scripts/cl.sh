@@ -6,8 +6,9 @@
 set -eu
 
 : "${ENVSUBST:="$(command -v envsubst)"}"
-: "${PAGER:="$( ( [ -n "$(command -v less)" ] && echo "$(command -v less)" -F ) || echo cat )"}"
+: "${PAGER:="$( ( command -v less >/dev/null && echo "$(command -v less)" -F ) || echo cat )"}"
 : "${SPONGE:="$(command -v sponge)"}"
+: "${NOTIFY_SEND:="$(command -v notify-send || echo true )"}"
 
 checklist_derive_path_from_slug()
 {
@@ -66,6 +67,12 @@ execution_get_substitutions()
 		set -u
 		[ -z "$p" ] || printf "$%s," "$pn";
 	done
+}
+
+run_notify()
+{
+	notify_script="$1"
+	${NOTIFY_SEND} --app-name cl "$notify_script" "Run complete"
 }
 
 help()
@@ -392,6 +399,10 @@ main()
 			sed '1d;$d' |
 			SHELL=/usr/bin/sh sh 2>&1 |
 			"$script" attach output "${execution_slug}" "${execution_script}"
+		if grep -E "[\`]{3}([a-z]+ )?name=${execution_script}" "$execution_path" | grep -q notify
+		then
+			run_notify "${execution_script}"
+		fi
 		;;
 
 	*)
