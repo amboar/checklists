@@ -121,8 +121,8 @@ Subcommands:
 
 Execution checklists (the concatonation of all listed checklists) are passed
 through [envsubst][man-1-envsubst]. This allows you to define values for the
-execution by setting them in the environment at the invocation of `cl run ...`,
-for instance: `MY_PARAMETER=foo cl run ...`
+execution by setting them in the environment at the invocation of `cl exec ...`,
+for instance: `MY_PARAMETER=foo cl exec ...`
 
 [man-1-envsubst]: https://www.man7.org/linux/man-pages/man1/envsubst.1.html
 
@@ -142,7 +142,7 @@ the environment are not substituted for the execution.
 
 ### Checklist metadata
 
-Invocations of `cl run ...` both substitute into the document and export the
+Invocations of `cl exec ...` both substitute into the document and export the
 following variables into the environment of `$EDITOR`:
 
 - `CL_EXECUTION_SLUG`
@@ -158,7 +158,7 @@ $ cl attach output "$CL_EXECUTION_SLUG" ...
 
 An entire script can be embedded to be run as a single step. For example:
 
-    - [ ] `cl run hello-world ${CL_EXECUTION_SLUG}`
+    - [ ] `cl exec hello-world ${CL_EXECUTION_SLUG}`
     
     ```sh name=hello-world
     set -eux
