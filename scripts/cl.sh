@@ -231,9 +231,9 @@ main()
 			if [ $# -gt 3 ]
 			then
 				shift 3
-				/bin/sh -lic "$*" 2>&1 | tee "$attachment_path"
+				/bin/sh -lic "$*" 2>&1 | tee --append "$attachment_path"
 			else
-				tee "$attachment_path"
+				tee --append "$attachment_path"
 			fi
 			;;
 		esac
