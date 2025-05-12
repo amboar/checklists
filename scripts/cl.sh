@@ -397,7 +397,7 @@ main()
 		execution_path="$(execution_derive_path_from_slug "$executions" "$execution_slug")"
 		sed --quiet -E "/[\`]{3}([a-z]+ )?name=${execution_script}/,/[\`]{3}/p" "${execution_path}" |
 			sed '1d;$d' |
-			SHELL=/usr/bin/sh sh 2>&1 |
+			( SHELL=/usr/bin/sh sh 2>&1 || kill $$ ) |
 			"$script" attach output "${execution_slug}" "${execution_script}"
 		if grep -E "[\`]{3}([a-z]+ )?name=${execution_script}" "$execution_path" | grep -q notify
 		then
