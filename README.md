@@ -168,7 +168,7 @@ An entire script can be embedded to be run as a single step. For example:
     printf "world!\n"
     ```
 
-For simplicity of the implementation such scripts are directly piped into `sh`.
-This may change down the track.
+The default interpreter for scripts is `sh`. Scripts may begin with a shebang
+line to customise the interpreter.
 
 The output of the script is attached to the current execution.
