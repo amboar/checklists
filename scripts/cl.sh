@@ -285,9 +285,10 @@ main()
 		done > "$execution_path"
 
 		checklist_parameters="$(checklist_get_parameters "$execution_path")"
+		export CL_EXECUTION_LABEL="$execution_label"
 		export CL_EXECUTION_SLUG="$execution_slug"
 		# shellcheck disable=SC2094,SC2086,SC2016
-		"$ENVSUBST" "$(execution_get_substitutions $checklist_parameters 'CL_EXECUTION_SLUG')" < "$execution_path" |
+		"$ENVSUBST" "$(execution_get_substitutions $checklist_parameters 'CL_EXECUTION_LABEL' 'CL_EXECUTION_SLUG')" < "$execution_path" |
 			"$SPONGE" "$execution_path" > /dev/null
 
 		"$EDITOR" "$execution_path" || ( rm "$execution_path" && rmdir "$execution_dir" && false )

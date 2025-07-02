@@ -145,6 +145,7 @@ the environment are not substituted for the execution.
 Invocations of `cl exec ...` both substitute into the document and export the
 following variables into the environment of `$EDITOR`:
 
+- `CL_EXECUTION_LABEL`
 - `CL_EXECUTION_SLUG`
 
 These exports can be used in subshells from your editor to attach e.g. command
