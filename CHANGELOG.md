@@ -8,3 +8,4 @@
 3. Export `$CL_EXECUTION_LABEL` into the editor environment and substitute
    instances in the execution document
 4. Filter attachments out of execution list
+5. Add 'resume' subcommand to resume existing executions

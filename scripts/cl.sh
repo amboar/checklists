@@ -124,6 +124,9 @@ help()
 	printf "\trename CURRENT NEW\n"
 	printf "\t\tRename a checklist identified by CURRENT to NEW\n"
 	echo
+	printf "\tresume EXECUTION\n"
+	printf "\t\tContinue working through an existing checklist's execution"
+	echo
 	printf "\trun SCRIPT EXECUTION\n"
 	printf "\t\tExtract SCRIPT from EXECUTION and run it, attaching the output\n"
 	printf "\t\tto EXECUTION\n"
@@ -388,6 +391,21 @@ main()
 			loge The destination checklist path \'"$dst_checklist_path"\' already exists
 
 		git mv "$src_checklist_path" "$dst_checklist_path" && git commit -m "checklists: Rename $dst_checklist_slug"
+		;;
+
+	resume)
+		[ $# -ge 1 ] ||
+			loge \'resume\' subcommand requires the name of the execution to resume
+
+		execution_slug="$1"
+		execution_path="$(execution_derive_path_from_slug "$executions" "$execution_slug")"
+		execution_dir="$(dirname "$execution_path")"
+
+		[ -f "$execution_path" ] ||
+			loge The execution path \'"$execution_path"\' does not exist
+
+		"$EDITOR" "$execution_path" || ( git restore "$execution_path" && false )
+		git add "$execution_dir" && git commit -m "executions: Updated $execution_slug"
 		;;
 
 	run)
