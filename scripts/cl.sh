@@ -319,7 +319,9 @@ main()
 			[ -d "$executions" ] ||
 				loge No checklists have yet been executed
 
-			find "$executions" -type f |
+			# We inject the '[comment]: # ' field into executions, so check for that
+			# XXX: Do something less brittle?
+			git -C "$root" grep -lF '[comment]: # ' -- "$executions" |
 				while read -r ex
 				do
 					execution_derive_slug_from_path "$executions" "$ex"
