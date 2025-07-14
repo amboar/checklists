@@ -110,6 +110,9 @@ Subcommands:
         rename CURRENT NEW
                 Rename a checklist identified by CURRENT to NEW
 
+        resume EXECUTION
+                Continue working through an existing checklist's execution
+
         run SCRIPT EXECUTION
                 Extract SCRIPT from EXECUTION and run it, attaching the output
                 to EXECUTION
