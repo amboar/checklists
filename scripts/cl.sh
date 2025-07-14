@@ -125,7 +125,7 @@ help()
 	printf "\t\tRename a checklist identified by CURRENT to NEW\n"
 	echo
 	printf "\tresume EXECUTION\n"
-	printf "\t\tContinue working through an existing checklist's execution"
+	printf "\t\tContinue working through an existing checklist's execution\n"
 	echo
 	printf "\trun SCRIPT EXECUTION\n"
 	printf "\t\tExtract SCRIPT from EXECUTION and run it, attaching the output\n"
