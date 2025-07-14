@@ -239,6 +239,9 @@ main()
 				tee --append "$attachment_path"
 			fi
 			;;
+		*)
+			loge Unrecognised \'attach\' subcommand: \'"$attach_subcmd"\'
+			;;
 		esac
 		;;
 
@@ -330,6 +333,9 @@ main()
 					execution_derive_slug_from_path "$executions" "$ex"
 				done | sort
 			;;
+		*)
+			loge Unrecognised \'list\' category: \'"$category"\'
+			;;
 		esac
 		;;
 
@@ -370,6 +376,9 @@ main()
 		parameters)
 			checklist_slug="$2"
 			checklist_get_parameters "$(checklist_derive_path_from_slug "$checklists" "$checklist_slug")" | $PAGER
+			;;
+		*)
+			loge Unrecognised \'show\' category: \'"$category"\'
 			;;
 		esac
 		;;
