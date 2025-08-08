@@ -2,11 +2,11 @@
 
 ## [Unreleased]
 
-1. Improve precision of cleanups to support concurrent checklist execution
-2. Allow embedding and execution of abitrary scripts in checklists
-   - See the documentation for `cl run ...`
-3. Export `$CL_EXECUTION_LABEL` into the editor environment and substitute
-   instances in the execution document
-4. Filter attachments out of execution list
-5. Add 'resume' subcommand to resume existing executions
-6. Move attached artifacts under execution slug directory
+- Improve precision of cleanups to support concurrent checklist execution
+- Allow embedding and execution of abitrary scripts in checklists
+- - See the documentation for `cl run ...`
+- Export `$CL_EXECUTION_LABEL` into the editor environment and substitute
+- instances in the execution document
+- Filter attachments out of execution list
+- Add 'resume' subcommand to resume existing executions
+- Move attached artifacts under execution slug directory
