@@ -218,7 +218,8 @@ main()
 		attach_subcmd="$1"
 		execution_slug="$2"
 
-		execution_dir="$(dirname "$(execution_derive_path_from_slug "$executions" "$execution_slug")")"
+		execution_dir="$executions"/"$execution_slug"
+		mkdir -p "$execution_dir"
 
 		case $attach_subcmd in
 		file)
@@ -325,13 +326,11 @@ main()
 			[ -d "$executions" ] ||
 				loge No checklists have yet been executed
 
-			# We inject the '[comment]: # ' field into executions, so check for that
-			# XXX: Do something less brittle?
-			git -C "$root" grep -lF '[comment]: # ' -- "$executions" |
+			git -C "$root" ls-files "${executions}"'/*/*.md' |
 				while read -r ex
 				do
 					execution_derive_slug_from_path "$executions" "$ex"
-				done | sort
+				done
 			;;
 		*)
 			loge Unrecognised \'list\' category: \'"$category"\'

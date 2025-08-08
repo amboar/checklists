@@ -9,3 +9,4 @@
    instances in the execution document
 4. Filter attachments out of execution list
 5. Add 'resume' subcommand to resume existing executions
+6. Move attached artifacts under execution slug directory
