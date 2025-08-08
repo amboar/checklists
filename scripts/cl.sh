@@ -115,11 +115,11 @@ help()
 	printf "\t\tLift the execution identified by EXECUTION to a checklist named\n"
 	printf "\t\tCHECKLIST for reuse\n"
 	echo
-	printf "\tshow <checklist | execution | parameters> NAME\n"
+	printf "\tshow <checklist | execution | parameters> NAME...\n"
 	printf "\t\tOutput a checklist or execution identified by NAME\n"
 	echo
 	printf "\t\tIn the case of 'parameters', show the variables that can be\n"
-	printf "\t\tsubstituted into the checklist from the environment\n"
+	printf "\t\tsubstituted into the listed checklists from the environment\n"
 	echo
 	printf "\trename CURRENT NEW\n"
 	printf "\t\tRename a checklist identified by CURRENT to NEW\n"
@@ -374,8 +374,12 @@ main()
 			$PAGER "$(execution_derive_path_from_slug "$executions" "$execution_slug")"
 			;;
 		parameters)
-			checklist_slug="$2"
-			checklist_get_parameters "$(checklist_derive_path_from_slug "$checklists" "$checklist_slug")" | $PAGER
+			shift
+			checklist_slugs="$*"
+			for slug in $checklist_slugs
+			do
+				checklist_get_parameters "$(checklist_derive_path_from_slug "$checklists" "$slug")"
+			done | sort -u
 			;;
 		*)
 			loge Unrecognised \'show\' category: \'"$category"\'

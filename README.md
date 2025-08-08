@@ -101,11 +101,11 @@ Subcommands:
                 Lift the execution identified by EXECUTION to a checklist named
                 CHECKLIST for reuse
 
-        show <checklist | execution | parameters> NAME
+        show <checklist | execution | parameters> NAME...
                 Output a checklist or execution identified by NAME
 
                 In the case of 'parameters', show the variables that can be
-                substituted into the checklist from the environment
+                substituted into the listed checklists from the environment
 
         rename CURRENT NEW
                 Rename a checklist identified by CURRENT to NEW
