@@ -129,8 +129,8 @@ for instance: `MY_PARAMETER=foo cl exec ...`
 
 [man-1-envsubst]: https://www.man7.org/linux/man-pages/man1/envsubst.1.html
 
-To exploit this you should must describe each formal parameter for the checklist
-in informal markdown comment style:
+To exploit this you must describe each formal parameter for the checklist in
+informal markdown comment style:
 
 ```
 [parameter]: # MY_PARAMETER
