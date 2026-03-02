@@ -69,6 +69,14 @@ execution_get_substitutions()
 	done
 }
 
+attachment_derive_path()
+{
+	execution_root="$1"
+	execution_slug="$2"
+	attachment_name="$3"
+	echo "${execution_root}/${execution_slug}/${attachment_name}"
+}
+
 run_notify()
 {
 	notify_script="$1"
@@ -115,7 +123,7 @@ help()
 	printf "\t\tLift the execution identified by EXECUTION to a checklist named\n"
 	printf "\t\tCHECKLIST for reuse\n"
 	echo
-	printf "\tshow <checklist | execution | parameters> NAME...\n"
+	printf "\tshow <attachment | checklist | execution | parameters> NAME...\n"
 	printf "\t\tOutput a checklist or execution identified by NAME\n"
 	echo
 	printf "\t\tIn the case of 'parameters', show the variables that can be\n"
@@ -360,10 +368,17 @@ main()
 
 	show)
 		[ $# -ge 2 ] ||
-			loge \'show\' subcommand requires two positional arguments, one of either \'checklist\' or \'execution\', followed by the name of the document to show
+			loge \'show\' subcommand requires two positional arguments, one of \'attachment\', \'checklist\', \'execution\', or \'parameters\'
 
 		category="$1"
 		case "$category" in
+		attachment)
+			[ $# -ge 3 ] ||
+				loge 'show attachment' subcommand requires attachment name
+			execution_slug="$2"
+			output="$3"
+			$PAGER "$(attachment_derive_path "$executions" "$execution_slug" "$output")"
+			;;
 		checklist)
 			checklist_slug="$2"
 			$PAGER "$(checklist_derive_path_from_slug "$checklists" "$checklist_slug")"
