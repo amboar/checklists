@@ -446,7 +446,7 @@ main()
 		execution_bin="$(mktemp --tmpdir="$(dirname "${execution_path}")")"
 		trap 'rm $execution_bin' EXIT
 
-		sed --quiet -E "/[\`]{3}([a-z]+ )?name=${execution_script}/,/[\`]{3}/p" "${execution_path}" |
+		sed --quiet -E "/[\`]{3}([a-z]+[[:space:]]+)?name=${execution_script}([[:space:]]+.*)?$/,/[\`]{3}/p" "${execution_path}" |
 			sed '1d;$d' > "$execution_bin"
 		chmod +x "$execution_bin"
 		if head -n1 "$execution_bin" | grep -q '^#!';
@@ -457,7 +457,7 @@ main()
 			( SHELL=/usr/bin/sh sh "$execution_bin" 2>&1 || kill $$ ) |
 				"$script" attach output "${execution_slug}" "${execution_script}"
 		fi
-		if grep -E "[\`]{3}([a-z]+ )?name=${execution_script}" "$execution_path" | grep -q notify
+		if grep -E "[\`]{3}([a-z]+[[:space:]]+)?name=${execution_script}([[:space:]]+.*)?$" "$execution_path" | grep -q notify
 		then
 			run_notify "${execution_script}"
 		fi
