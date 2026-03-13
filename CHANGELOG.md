@@ -10,3 +10,4 @@
 - Filter attachments out of execution list
 - Add 'resume' subcommand to resume existing executions
 - Move attached artifacts under execution slug directory
+- Avoid concatenating scripts named with a common prefix
