@@ -239,7 +239,8 @@ main()
 			attachment_name="$3"
 
 			attachment_path="$execution_dir"/"$attachment_name"
-			cd - # Change back to where we were invoked, as directory context may be important
+			# Change back to where we were invoked, as directory context may be important
+			cd - >/dev/null 2>&1
 			if [ $# -gt 3 ]
 			then
 				shift 3
