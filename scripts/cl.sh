@@ -445,7 +445,7 @@ main()
 			loge The execution path \'"$execution_path"\' does not exist
 
 		"$EDITOR" "$execution_path" || ( git restore "$execution_path" && false )
-		git add "$execution_dir" && git commit -m "executions: Updated $execution_slug"
+		git add "$execution_dir" && git commit -m "executions: Capture $execution_slug"
 		;;
 
 	run)
