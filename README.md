@@ -94,7 +94,7 @@ Subcommands:
         help
                 Show help text
 
-        list <checklists | executions>
+        list <checklists | executions | incomplete>
                 List checklists or executions
 
         promote EXECUTION CHECKLIST

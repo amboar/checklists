@@ -116,7 +116,7 @@ help()
 	printf "\thelp\n"
 	printf "\t\tShow help text\n"
 	echo
-	printf "\tlist <checklists | executions>\n"
+	printf "\tlist <checklists | executions | incomplete>\n"
 	printf "\t\tList checklists or executions\n"
 	echo
 	printf "\tpromote EXECUTION CHECKLIST\n"
@@ -339,6 +339,18 @@ main()
 				while read -r ex
 				do
 					execution_derive_slug_from_path "$executions" "$ex"
+				done
+			;;
+		incomplete)
+			[ -d "$executions" ] ||
+				loge No checklists have yet been executed
+
+			git status --porcelain --untracked-files=all 'executions/????Y??m??d??H??M/*.md' |
+				awk '{ print $2 }' |
+				while read -r P
+				do
+					E="$(realpath --relative-base=executions "$P")"
+					echo "$(dirname "$E")"/"$(basename "$E" .md)"
 				done
 			;;
 		*)
