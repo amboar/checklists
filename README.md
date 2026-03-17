@@ -162,7 +162,7 @@ $ cl attach output "$CL_EXECUTION_SLUG" ...
 
 An entire script can be embedded to be run as a single step. For example:
 
-    - [ ] `cl exec hello-world ${CL_EXECUTION_SLUG}`
+    - [ ] `cl run hello-world ${CL_EXECUTION_SLUG}`
     
     ```sh name=hello-world
     set -eux
