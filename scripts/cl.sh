@@ -119,6 +119,13 @@ help()
 	printf "\tlist <checklists | executions | incomplete>\n"
 	printf "\t\tList checklists or executions\n"
 	echo
+	printf "\tpath CHECKLIST [ CHECKLIST ... ]\n"
+	printf "\t\tPrint a total order of the dependencies of CHECKLIST\n"
+	echo
+	printf "\tplot CHECKLIST [ CHECKLIST ... ]\n"
+	printf "\t\tPrint the transitive dependencies of CHECKLIST for topological\n"
+	printf "\t\tsorting\n"
+	echo
 	printf "\tpromote EXECUTION CHECKLIST\n"
 	printf "\t\tLift the execution identified by EXECUTION to a checklist named\n"
 	printf "\t\tCHECKLIST for reuse\n"
@@ -284,11 +291,12 @@ main()
 		execution_label="$1"
 		shift
 		checklist_slugs="$*"
+		checklist_slugs="$("$script" path $checklist_slugs)"
 		execution_datetime="$(execution_generate_datetime)"
 		execution_slug="$(execution_derive_slug_from_components "$execution_datetime" "$execution_label")"
 		execution_path="$(execution_derive_path_from_slug "$executions" "$execution_slug")"
-		for slug in $checklist_slugs; do [ -f "$(checklist_derive_path_from_slug "$checklists" "$slug")" ]; done
 
+		for slug in $checklist_slugs; do [ -f "$(checklist_derive_path_from_slug "$checklists" "$slug")" ]; done
 		[ ! -f "$execution_path" ] ||
 			loge Execution path \'"$execution_path"\' already exists
 
@@ -357,6 +365,29 @@ main()
 			loge Unrecognised \'list\' category: \'"$category"\'
 			;;
 		esac
+		;;
+
+	path)
+		[ $# -ge 1 ] ||
+			loge \'path\' subcommand requires one or more checklists
+
+		"$script" plot $* | tsort | tac
+		;;
+
+	plot)
+		[ $# -ge 1 ] ||
+			loge \'plot\' subcommand requires one or more checklists
+
+		for cl
+		do
+			clp="$(checklist_derive_path_from_slug "$checklists" "$cl")"
+			ds="$(awk '/^\[require\]: #/ { print $3 }' "$clp")"
+			for d in $ds
+			do
+				echo $cl $d
+			done
+			if [ -n "$ds" ]; then "$script" plot $ds; fi
+		done
 		;;
 
 	promote)

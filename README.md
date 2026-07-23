@@ -97,6 +97,13 @@ Subcommands:
         list <checklists | executions | incomplete>
                 List checklists or executions
 
+        path CHECKLIST [ CHECKLIST ... ]
+                Print a total order of the dependencies of CHECKLIST
+
+        plot CHECKLIST [ CHECKLIST ... ]
+                Print the transitive dependencies of CHECKLIST for topological
+                sorting
+
         promote EXECUTION CHECKLIST
                 Lift the execution identified by EXECUTION to a checklist named
                 CHECKLIST for reuse
@@ -142,6 +149,19 @@ In this way both you and `cl` can determine what substitutions are possible.
 The list of parameters defined by a checklist can be discovered using `cl show
 parameters CHECKLIST`. Checklist parameters whose variables are not defined in
 the environment are not substituted for the execution.
+
+### Checklist dependencies
+
+Checklists that require other checklists to be executed prior can indicate this
+using `require` statements. Where checklist `B` depends on checklist `A`, add
+the following in checklist `B`:
+
+```
+[require]: # A
+```
+
+The dependency graph covering all checklists provided for the `execute`
+subcommand is refined into an appropriate total ordering.
 
 ### Checklist metadata
 
