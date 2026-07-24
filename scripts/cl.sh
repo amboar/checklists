@@ -434,6 +434,7 @@ main()
 		parameters)
 			shift
 			checklist_slugs="$*"
+			checklist_slugs="$("$script" path $checklist_slugs)"
 			for slug in $checklist_slugs
 			do
 				checklist_get_parameters "$(checklist_derive_path_from_slug "$checklists" "$slug")"
