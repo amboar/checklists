@@ -97,8 +97,9 @@ Subcommands:
         list <checklists | executions | incomplete>
                 List checklists or executions
 
-        path CHECKLIST [ CHECKLIST ... ]
-                Print a total order of the dependencies of CHECKLIST
+        path EXECUTION [ CHECKLIST ... ]
+                Print a total order of the transitive dependencies of CHECKLIST
+                for EXECUTION
 
         plot CHECKLIST [ CHECKLIST ... ]
                 Print the transitive dependencies of CHECKLIST for topological

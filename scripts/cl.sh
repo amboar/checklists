@@ -119,8 +119,9 @@ help()
 	printf "\tlist <checklists | executions | incomplete>\n"
 	printf "\t\tList checklists or executions\n"
 	echo
-	printf "\tpath CHECKLIST [ CHECKLIST ... ]\n"
-	printf "\t\tPrint a total order of the dependencies of CHECKLIST\n"
+	printf "\tpath EXECUTION [ CHECKLIST ... ]\n"
+	printf "\t\tPrint a total order of the transitive dependencies of CHECKLIST\n"
+	printf "\t\tfor EXECUTION\n"
 	echo
 	printf "\tplot CHECKLIST [ CHECKLIST ... ]\n"
 	printf "\t\tPrint the transitive dependencies of CHECKLIST for topological\n"
@@ -368,25 +369,28 @@ main()
 		;;
 
 	path)
-		[ $# -ge 1 ] ||
-			loge \'path\' subcommand requires one or more checklists
+		[ $# -ge 2 ] ||
+			loge \'path\' subcommand requires an execution name and one or more checklists
 
-		"$script" plot $* | tsort | tac
+		execution_label=$1
+		shift
+
+		"$script" plot $execution_label $* | tsort | tac | grep -xv $execution_label
 		;;
 
 	plot)
 		[ $# -ge 1 ] ||
 			loge \'plot\' subcommand requires one or more checklists
 
-		for cl
+		cl_root="$1"
+		shift
+
+		for cl_child
 		do
-			clp="$(checklist_derive_path_from_slug "$checklists" "$cl")"
-			ds="$(awk '/^\[require\]: #/ { print $3 }' "$clp")"
-			for d in $ds
-			do
-				echo $cl $d
-			done
-			if [ -n "$ds" ]; then "$script" plot $ds; fi
+			echo $cl_root $cl_child
+			cl_child_path="$(checklist_derive_path_from_slug "$checklists" "$cl_child")"
+			cl_child_requires="$(awk '/^\[require\]: #/ { print $3 }' "$cl_child_path")"
+			if [ -n "$cl_child_requires" ]; then "$script" plot $cl_child $cl_child_requires; fi
 		done
 		;;
 
