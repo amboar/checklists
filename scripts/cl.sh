@@ -292,10 +292,11 @@ main()
 		execution_label="$1"
 		shift
 		checklist_slugs="$*"
-		checklist_slugs="$("$script" path $checklist_slugs)"
 		execution_datetime="$(execution_generate_datetime)"
 		execution_slug="$(execution_derive_slug_from_components "$execution_datetime" "$execution_label")"
 		execution_path="$(execution_derive_path_from_slug "$executions" "$execution_slug")"
+
+		checklist_slugs="$("$script" path $execution_slug $checklist_slugs)"
 
 		for slug in $checklist_slugs; do [ -f "$(checklist_derive_path_from_slug "$checklists" "$slug")" ]; done
 		[ ! -f "$execution_path" ] ||
